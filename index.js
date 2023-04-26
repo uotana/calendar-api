@@ -35,3 +35,5 @@ app.get('/events/:calendar_id', db.getEventsByCalendarId)
 app.post('/events', db.createEvent);
 app.put('/events/:event_id', db.updateEvent);
 app.delete('/events/:event_id', db.deleteEvent);
+
+app.get('/tags', db.getTags);

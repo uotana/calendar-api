@@ -122,12 +122,12 @@ const createEvent = (request, response) => {
 }
 const updateEvent = (request, response) => {
 
-  const { event_title, event_description, start_date, end_date, calendar_id} = request.body;
+  let { event_title, event_description, start_date, end_date} = request.body;
   const event_id = parseInt(request.params.event_id);
 
   pool.query(
-    'UPDATE events SET event_tittle = $1, event_description = $2, start_date =$3, end_date =$4, calendar_id=$5 WHERE event_id = $3 RETURNING event_id',
-    [event_title, event_description, start_date, end_date, calendar_id],
+    'UPDATE events SET event_tittle = $1, event_description = $2, start_date =$3, end_date =$4 WHERE event_id=$5 RETURNING event_id',
+    [event_title, event_description, start_date, end_date, event_id],
     (error, results) => {
       if (error) throw error;
       response.status(200).send(`Event modified with ID: ${event_id}`)
@@ -143,22 +143,31 @@ const deleteEvent = (request, response) => {
   })
 }
 
-  module.exports = {
-    getUsers,
-    getUserById,
-    createUser,
-    updateUser,
-    deleteUser,
-    
-    createCalendar,
-    getCalendars,
-    getCalendarById,
-    getCalendarByUserId,
+const getTags = (request, response) => {
+  pool.query('SELECT * FROM tags', (error, results) => {
+    if (error) throw error;
+    response.status(200).json(results.rows)
+  })
+}
 
-    getEvents,
-    getEventById,
-    getEventsByCalendarId,
-    createEvent,
-    updateEvent,
-    deleteEvent,
-  }
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  
+  createCalendar,
+  getCalendars,
+  getCalendarById,
+  getCalendarByUserId,
+
+  getEvents,
+  getEventById,
+  getEventsByCalendarId,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+
+  getTags
+}
