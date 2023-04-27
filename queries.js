@@ -114,20 +114,21 @@ const getEventsByCalendarId = (request, response) => {
   })
 }
 const createEvent = (request, response) => {
-  const { event_tittle, event_description, start_date, end_date, calendar_id} = request.body;
-  pool.query('INSERT INTO events (event_tittle, event_description, start_date, end_date, calendar_id) VALUES ($1, $2, $3, $4, $5) RETURNING event_id', [event_tittle, event_description, start_date, end_date, calendar_id], (error, results) => {
+  const { event_tittle, event_description} = request.body;
+  pool.query('INSERT INTO events (event_title, event_description) VALUES ($1, $2) RETURNING event_id',
+   [event_tittle, event_description], (error, results) => {
     if (error) throw error;
     response.status(201).send(`Event added with ID: ${results.rows[0].event_id}`)
   })
 }
 const updateEvent = (request, response) => {
 
-  let { event_title, event_description, start_date, end_date} = request.body;
+  let { event_title, event_description} = request.body;
   const event_id = parseInt(request.params.event_id);
 
   pool.query(
-    'UPDATE events SET event_tittle = $1, event_description = $2, start_date =$3, end_date =$4 WHERE event_id=$5 RETURNING event_id',
-    [event_title, event_description, start_date, end_date, event_id],
+    'UPDATE events SET event_tittle = $1, event_description = $2 WHERE event_id=$3 RETURNING event_id',
+    [event_title, event_description, event_id],
     (error, results) => {
       if (error) throw error;
       response.status(200).send(`Event modified with ID: ${event_id}`)
