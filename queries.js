@@ -37,7 +37,7 @@ const createUser = (request, response) => {
       if (error) {
         throw error;
       }
-      response.status(201).send(`User added with ID: ${results.rows[0].user_id}`)
+      response.status(200).json(results.rows);
     })
 }
 const updateUser = (request, response) => {
@@ -87,7 +87,7 @@ const createCalendar = (request, response) => {
       if (error) {
         throw error;
       }
-      response.status(201).send(`Calendar added with ID: ${results.rows[0].calendar_id}`)
+      response.status(200).json(results.rows);
     })
   }
 
@@ -114,11 +114,11 @@ const getEventsByCalendarId = (request, response) => {
   })
 }
 const createEvent = (request, response) => {
-  const { event_tittle, event_description} = request.body;
-  pool.query('INSERT INTO events (event_title, event_description) VALUES ($1, $2) RETURNING event_id',
-   [event_tittle, event_description], (error, results) => {
+  const { event_title, event_description} = request.body;
+  pool.query('INSERT INTO events (event_title, event_description) VALUES ($1, $2) RETURNING *',
+   [event_title, event_description], (error, results) => {
     if (error) throw error;
-    response.status(201).send(`Event added with ID: ${results.rows[0].event_id}`)
+    response.status(200).json(results.rows);
   })
 }
 const updateEvent = (request, response) => {
@@ -127,7 +127,7 @@ const updateEvent = (request, response) => {
   const event_id = parseInt(request.params.event_id);
 
   pool.query(
-    'UPDATE events SET event_tittle = $1, event_description = $2 WHERE event_id=$3 RETURNING event_id',
+    'UPDATE events SET event_title = $1, event_description = $2 WHERE event_id=$3 RETURNING event_id',
     [event_title, event_description, event_id],
     (error, results) => {
       if (error) throw error;
