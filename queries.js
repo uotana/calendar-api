@@ -48,7 +48,7 @@ const updateUser = (request, response) => {
       [user_name, user_email, user_id],
       (error, results) => {
         if (error) throw error;
-        response.status(200).send(`User modified with ID: ${user_id}`)
+        response.status(200);
       }
     )
 }
@@ -56,7 +56,7 @@ const deleteUser = (request, response) => {
     const id = parseInt(request.params.user_id);
     pool.query('DELETE FROM users WHERE user_id = $1', [id], (error, results) => {
       if (error) throw error;
-      response.status(200).send(`User deleted with ID: ${id}`)
+      response.status(200);
     })
 }
 
@@ -136,11 +136,10 @@ const updateEvent = (request, response) => {
   )
 }
 const deleteEvent = (request, response) => {
-  const id = parseInt(request.params.event_id);
-
-  pool.query('DELETE FROM events WHERE event_id = $1', [id], (error, results) => {
+  const event_id = parseInt(request.params.event_id);
+  pool.query('DELETE FROM events WHERE event_id = $1', [event_id], (error, results) => {
     if (error) throw error;
-    response.status(200).send(`Event deleted with ID: ${id}`)
+    response.status(200);
   })
 }
 
