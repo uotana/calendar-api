@@ -118,7 +118,7 @@ const createEvent = (request, response) => {
   pool.query('INSERT INTO events (event_title, event_description) VALUES ($1, $2) RETURNING *',
    [event_title, event_description], (error, results) => {
     if (error) throw error;
-    response.status(200).json(results.rows);
+    response.status(201).json(results.rows);
   })
 }
 const updateEvent = (request, response) => {
