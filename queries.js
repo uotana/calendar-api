@@ -122,18 +122,14 @@ const createEvent = (request, response) => {
   })
 }
 const updateEvent = (request, response) => {
-
-  let { event_title, event_description} = request.body;
+  let { event_title, event_description } = request.body;
   const event_id = parseInt(request.params.event_id);
-
+  console.log('event_id: ', event_id);
   pool.query(
-    'UPDATE events SET event_title = $1, event_description = $2 WHERE event_id=$3 RETURNING event_id',
-    [event_title, event_description, event_id],
-    (error, results) => {
+    'UPDATE events SET event_title = $1, event_description = $2 WHERE event_id=$3 RETURNING *',[event_title, event_description, event_id], (error, results) => {
       if (error) throw error;
-      response.status(200).send(`Event modified with ID: ${event_id}`)
-    }
-  )
+      response.status(200).json(results.rows);
+    })
 }
 const deleteEvent = (request, response) => {
   const event_id = parseInt(request.params.event_id);
