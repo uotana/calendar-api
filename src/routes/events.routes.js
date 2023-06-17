@@ -6,7 +6,7 @@ import {
      getEvents,
      getEventsByCalendarId,
      updateEvent
-} from '../controllers/event.controller';
+} from '../controllers/event.controller.js';
 
 const router = Router();
 

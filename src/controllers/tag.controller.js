@@ -1,4 +1,4 @@
-import { pool } from '../../connection';
+import { pool } from '../../connection.js';
 
 // Busca todos os marcadores
 export async function getTags(request, response) {

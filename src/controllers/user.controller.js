@@ -1,4 +1,4 @@
-import { pool } from '../../connection';
+import { pool } from '../../connection.js';
 
 // Lista todos os usuários
 export async function getUsers(request, response) {

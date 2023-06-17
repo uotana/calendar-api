@@ -1,4 +1,4 @@
-import { pool } from '../../connection';
+import { pool } from '../../connection.js';
 
 // Busca todos os eventos
 export async function getEvents(request, response) {

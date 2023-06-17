@@ -1,4 +1,4 @@
-import { pool } from '../../connection';
+import { pool } from '../../connection.js';
 
 // Seleciona todas as agendas
 export async function getCalendars(request, response) {

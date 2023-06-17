@@ -4,7 +4,7 @@ import {
      getCalendarById,
      getCalendarByUserId,
      getCalendars
-} from '../controllers/calendar.controller';
+} from '../controllers/calendar.controller.js';
 
 const router = Router();
 
