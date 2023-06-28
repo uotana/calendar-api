@@ -58,7 +58,7 @@ export async function updateTag(request, response) {
           const id = parseInt(request.params.tag_id);
 
           const tagId = await pool.query(
-               'UPDATE tags SET tag_name = $1 WHERE tag_id = $2 RETURNING tag_id',[tag_name, id]
+               'UPDATE tags SET tag_name = $1 WHERE tag_id = $2 RETURNING tag_id', [tag_name, id]
           );
 
           if (tagId) {

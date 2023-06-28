@@ -46,9 +46,9 @@ export async function getEventsByCalendarId(request, response) {
 // Cria um evento
 export async function createEvent(request, response) {
      try {
-          const { event_title, event_description } = request.body;
+          const { event_title, event_description, event_tag } = request.body;
 
-          const event = await pool.query('INSERT INTO events (event_title, event_description) VALUES ($1, $2) RETURNING *', [event_title, event_description]);
+          const event = await pool.query('INSERT INTO events (event_title, event_description, event_tag) VALUES ($1, $2) RETURNING *', [event_title, event_description, event_tag]);
 
           return response.status(201).json({
                message: 'Evento criado com sucesso.',
@@ -66,11 +66,11 @@ export async function createEvent(request, response) {
 // Atualiza um evento existente
 export async function updateEvent(request, response) {
      try {
-          const { event_title, event_description } = request.body;
+          const { event_title, event_description, event_tag } = request.body;
 
           const event_id = parseInt(request.params.event_id);
 
-          const event = await pool.query('UPDATE events SET event_title = $1, event_description = $2 WHERE event_id=$3 RETURNING *', [event_title, event_description, event_id]);
+          const event = await pool.query('UPDATE events SET event_title = $1, event_description = $2, event_tag=$3 WHERE event_id=$4 RETURNING *', [event_title, event_description, event_tag, event_id]);
           
           return response.status(200).json({
                message: 'Evento atualizado com sucesso',
