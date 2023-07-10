@@ -3,7 +3,12 @@ import { pool } from '../../connection.js';
 // Busca todos os eventos
 export async function getEvents(request, response) {
      try {
-          const getEvents = await pool.query('SELECT * FROM events');
+          const getEvents = await pool.query(
+               `SELECT e.id, e.title, e.description, e.date, m.id AS tag_id, m.name AS tag_name
+               FROM events e
+               LEFT JOIN event_tags em ON e.id = em.event_id
+               LEFT JOIN tags m ON em.tag_id = m.id;`
+          );
 
           if (getEvents) {
                const events = getEvents.rows;

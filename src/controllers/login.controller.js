@@ -36,6 +36,11 @@ export async function login(request, response) {
           return response.status(200).json({
                status: 'success',
                message: 'Logged in successfully.',
+               user: {
+                    id: checkUser.id,
+                    name: checkUser.name,
+                    email: checkUser.email
+               },
                token
           });
      } catch (error) {
