@@ -1,11 +1,25 @@
 import { pool } from '../../connection.js';
+import bcrypt from 'bcrypt';
+
+const salt = 10;
 
 // Lista todos os usuários
 export async function getUsers(request, response) {
      try {
           const query = await pool.query('SELECT * FROM users');
 
-          if (query) return response.status(200).json({ query });
+          if (query) {
+               const users = query.rows;
+
+               users.map((user) => {
+                    delete user.password;
+                    delete user.created_at;
+               });
+
+               return response.status(200).json({ users });
+          } else {
+               return response.status(200).json([]);
+          };
      } catch (error) {
           console.log(error);
           throw error;
@@ -15,11 +29,22 @@ export async function getUsers(request, response) {
 // Seleciona um usuário em específico
 export async function getUserById(request, response) {
      try {
-          const id = parseInt(request.params.user_id);
+          const id = parseInt(request.params.id);
 
-          const user = pool.query('SELECT * FROM users WHERE user_id = $1', [id]);
+          const foundUser = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
 
-          return response.status(200).json({ user });
+          if (foundUser) {
+               const user = foundUser.rows[0];
+
+               delete user.password;
+
+               return response.status(200).json({ user });
+          } else {
+               return response.status(400).json({
+                    status: 'error',
+                    message: 'Usuário não encontrado.'
+               })
+          };
      } catch (error) {
           console.log(error);
 
@@ -30,38 +55,106 @@ export async function getUserById(request, response) {
 // Cria um novo usuário
 export async function createUser(request, response) {
      try {
-          const { user_name, user_email } = request.body;
+          const { name, email, password } = request.body;
 
-          const userId = pool.query('INSERT INTO users (user_name, user_email) VALUES ($1, $2) RETURNING user_id', [user_name, user_email]);
+          if (!name) return response.status(400).json({
+               status: 'error',
+               message: 'O nome é obrigatório.'
+          });
 
-          if (userId) {
-               return response.status(200).json({
-                    message: 'Usuário criado com sucesso.',
-                    data: {
-                         userId
-                    }
+          if (!email) return response.status(400).json({
+               status: 'error',
+               message: 'O e-mail é obrigatório.'
+          });
+
+          if (!password) return response.status(400).json({
+               status: 'error',
+               message: 'A senha é obrigatória.'
+          });
+
+          const hash = await bcrypt.hash(password, salt);
+
+          const newUser = await pool.query(
+               'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name',
+               [name, email, hash]
+          );
+
+          if (newUser) {
+               const data = {
+                    user_id: newUser.rows[0].id,
+                    name: `Eventos de ${newUser.rows[0].name}`
+               };
+
+               const newTag = await pool.query(
+                    'INSERT INTO tags (user_id, name) VALUES ($1, $2) RETURNING id',
+                    [data.user_id, data.name]
+               );
+
+               if (newTag) {
+                    return response.status(200).json({
+                         status: 'success',
+                         message: 'Usuário criado com sucesso.'
+                    });
+               };
+          } else {
+               return response.status(400).json({
+                    status: 'error',
+                    message: 'Ocorreu um erro na criação do usuário.'
                });
-          } else { }
+          };
      } catch (error) {
+          console.log(error);
 
-     }
+          throw error;
+     };
 };
 
 // Atualiza um usuário existente
 export async function updateUser(request, response) {
      try {
-          const { user_name, user_email } = request.body;
+          const { name, email, password, newPassword } = request.body;
 
-          const user_id = parseInt(request.params.user_id);
+          const id = parseInt(request.params.id);
 
-          const userId = await pool.query(
-               'UPDATE users SET user_name = $1, user_email = $2 WHERE user_id = $3 RETURNING user_id',
-               [user_name, user_email, user_id]
+          const user = await pool.query(
+               'SELECT * FROM users WHERE id = $1',
+               [id]
           );
 
-          if (userId) {
-               return response.status(200);
-          } else { };
+          console.log(user);
+
+          if (user.rows.length === 0) return response.status(400).json({
+               status: 'error',
+               message: 'Usuário não encontrado.'
+          });
+
+          const checkUser = user.rows[0];
+
+          const matchPassword = await bcrypt.compare(password, checkUser.password);
+
+          if (!matchPassword) return response.status(400).json({
+               status: 'error',
+               message: 'Senha incorreta.'
+          });
+
+          const hash = await bcrypt.hash(newPassword, salt);
+
+          const updatedUser = await pool.query(
+               'UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING id',
+               [name, email, hash, id]
+          );
+
+          if (updatedUser) {
+               return response.status(200).json({
+                    status: 'success',
+                    message: 'Usuário alterado com sucesso.'
+               });
+          } else {
+               return response.status(400).json({
+                    status: 'error',
+                    message: 'Ocorreu um erro ao alterar os dados do usuário.'
+               });
+          };
      } catch (error) {
           console.log(error);
 
@@ -72,9 +165,22 @@ export async function updateUser(request, response) {
 // Exclui um usuário existente
 export async function deleteUser(request, response) {
      try {
-          const id = parseInt(request.params.user_id);
+          const id = parseInt(request.params.id);
 
-          await pool.query('DELETE FROM users WHERE user_id = $1', [id]);
+          const user = await pool.query(
+               'SELECT * FROM users WHERE id = $1',
+               [id]
+          );
+
+          if (!user) return response.status(400).json({
+               status: 'error',
+               message: 'Usuário não encontrado.'
+          });
+
+          await pool.query(
+               'DELETE FROM users WHERE id = $1',
+               [id]
+          );
 
           return response.status(200).json({
                message: 'O usuário foi excluído com sucesso.'

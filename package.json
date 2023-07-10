@@ -4,8 +4,10 @@
           "dev": "npx nodemon server.js"
      },
      "dependencies": {
+          "bcrypt": "^5.1.0",
           "cors": "^2.8.5",
           "dotenv": "^16.0.3",
+          "jsonwebtoken": "^9.0.1",
           "nodemon": "^2.0.22",
           "pg": "^8.10.0"
      },

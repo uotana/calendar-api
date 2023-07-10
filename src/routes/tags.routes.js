@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { 
     getTags, 
-    getTagById,
     createTag,
     updateTag,
     deleteTag
@@ -10,9 +9,8 @@ import {
 const router = Router();
 
 router.get('/', getTags);
-router.get('/:tag_id', getTagById);
 router.post('/', createTag);
-router.put('/:tag_id', updateTag);
-router.delete('/:tag_id', deleteTag);
+router.put('/:id', updateTag);
+router.delete('/:id', deleteTag);
 
 export default router;
